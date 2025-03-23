@@ -227,5 +227,101 @@ f)config file provider(for nexus steup)
 7)setup the nexus --go to the plugin in jenkins and installed the config file provider and after the you can see the managed files in managed jenkins then provide the maven-snapshots and maven-release inside the server section.
 --
 
+7)Kubeadm installation for master node
+--
+  1  clear
+    2  sudo apt update
+    3  sudo apt upgrade
+    4  sudo apt-get update
+    5  sudo swapoff -a 
+    6  sudo sed -i '/ swap / s/^/#/' /etc/fstab
+    7  # Install Docker
+    8  sudo apt update
+    9  sudo apt install -y docker.io
+   10  sudo systemctl enable docker
+   11  sudo systemctl start docker
+   12  # Verify Docker
+   13  docker --version
+   14  docker ps
+   15  sudo chmod 666 /var/run/docker.sock
+   16  docker ps
+   17  sudo apt update
+   18  # Add Kubernetes repository (use the new official URL)
+   19  sudo apt update
+   20  sudo apt install -y apt-transport-https ca-certificates curl
+   21  curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+   22  echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+   23  # Install tools
+   24  sudo apt update
+   25  sudo apt install -y kubelet kubeadm kubectl
+   26  sudo apt-mark hold kubelet kubeadm kubectl  # Prevent auto-updates
+   27  # Verify
+   28  kubeadm version
+   29  kuectl version
+   30  kubectl version
+   31  kubelet version
+   32  kubelet --version
+   33  kubeadm version
+   34  cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+
+   35  cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+
+   36  sudo sysctl --system
+   37  sudo kubeadm init
+   38  history
+   kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/calico.yaml
+
+# Get the join command (SAVE THIS OUTPUT)
+kubeadm token create --print-join-command
+
+   9).Kubeadm installation for worker node
+   --
+   chandanchoudhary7315@worker-node:~$ history
+    1  sudo apt-get update && upgrade
+    2  sudo apt-get upgrade
+    3  sudo swapoff -a                         # Disable swap temporarily
+    4  sudo sed -i '/ swap / s/^/#/' /etc/fstab # Disable permanently
+    5  # Install Docker
+    6  sudo apt update
+    7  sudo apt install -y docker.io
+    8  sudo systemctl enable docker
+    9  sudo systemctl start docker
+   10  # Verify Docker
+   11  docker --version
+   12  docker ps
+   13  sudo chmod 666 /var/run/docker.sock
+   14  docker ps
+   15  # Add Kubernetes repository (use the new official URL)
+   16  sudo apt update
+   17  sudo apt install -y apt-transport-https ca-certificates curl
+   18  curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+   19  echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+   20  # Install tools
+   21  sudo apt update
+   22  sudo apt install -y kubelet kubeadm kubectl
+   23  sudo apt-mark hold kubelet kubeadm kubectl  # Prevent auto-updates
+   24  # Verify
+   25  kubeadm version
+   26  cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+
+   27  cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+
+   28  sudo sysctl --system
+   29  kubeadm join 10.154.0.2:6443 --token s5scan.09ye12pw39pkqsn5 --discovery-token-ca-cert-hash sha256:9336fe0a8f1a197f56a821b13bfa8dfc849e3a1f412f713d2b6267eaba1ae571
+   30  sudo kubeadm join 10.154.0.2:6443 --token s5scan.09ye12pw39pkqsn5 --discovery-token-ca-cert-hash sha256:9336fe0a8f1a197f56a821b13bfa8dfc849e3a1f412f713d2b6267eaba1ae571
+   31  history
+
 
 
