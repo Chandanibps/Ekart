@@ -69,35 +69,43 @@ pipeline {
                 }
             }
         }
-    }stage('dokcer bulid and tag') {
+
+        stage('Docker Build and Tag') {
             steps {
-               script {
-                   withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker') {
-                     dir('/var/lib/jenkins/workspace/virtual Browser/.docker/firefox') {
-                         sh 'docker build -t chandanibps/ekart:latest .'
-   
-                      }
-                }
-               }
-            }
-        }
-        stage('Trivy scan') {
-            steps {
-                
-                sh "trivy image chandanibps/ekart:latest"
-            
-            }
-        }
-        
-        stage("Docker  Push"){
-            steps{
-                script{
-                   withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker'){   
-                      
-                       sh "docker push chandanibps/ekart:latest "
+                script {
+                    withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker') {
+                         
+                            sh 'docker build -t chandanibps/ekart:latest -f docker/Dockerfile .'
+                        
                     }
                 }
             }
         }
+
+        stage('Trivy Scan') {
+            steps {
+                // Make sure Trivy is installed or available in the Docker image
+                sh "trivy image chandanibps/ekart:latest"
+            }
+        }
+        
+        stage('Docker Push') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker') {
+                        sh "docker push chandanibps/ekart:latest"
+                    }
+                }
+            }
+        }
+        stage('k8 deploy') {
+            steps {
+               withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://192.168.49.2:8443') {
+                   sh "kubectl apply -f deploymentservice.yml -n webapps"
+                   sh "kubectl get svc -n webapps"
     
+                }
+            }
+        }
+    }
 }
