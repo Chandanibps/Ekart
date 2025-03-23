@@ -168,13 +168,13 @@ web interface url path, as well as the datasource url.
 
 
 
-
-
-
-
-
 ---------------Notes-------------------------------------------------------------------------------------------
-1)crete three instance(jenkins,nexus and sonar qube)
+
+
+
+
+create three instance(jenkins,nexus and sonar qube)
+
 Installing jenkins on one server---
 step1:install java first 
 "apt install openjdk-17-jre-headless"
@@ -207,3 +207,8 @@ D)Nexus Artifact Uploader
 E)Eclipse Temurin installer
 
 5)go to the tool tabs in jenkins and do all the setting releated to the tools which one we have insatlled.
+w
+
+
+
+
