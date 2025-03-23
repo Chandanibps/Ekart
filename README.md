@@ -170,13 +170,17 @@ web interface url path, as well as the datasource url.
 
 
 --------------- -------------------------------------  Notes---------------------------------------------------------
+
+
 1.Create three instance(jenkins,nexus and sonar qube)
+--
 Installing jenkins on one server---
-install java first 
+a)install java first 
 
 "apt install openjdk-17-jre-headless"
 
-Install jenkins and open the port 8080
+b)Install jenkins and open the port 8080
+--
 
 
 """ sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
@@ -189,27 +193,39 @@ sudo apt-get install jenkins       """"
 
 
 2.Now install sonarqube.
+--
 
- insatlling docker first
+a)insatlling docker first
+--
 
 "  sudo apt install docker.io"
 
 "sudo usermod -aG docker $USER && newgrp docker" or "sudo chmod 777 /var/run/docker.sock"
 
- "  docker run -d -p 9000:9000 sonarqube:lts-community "
+b) "  docker run -d -p 9000:9000 sonarqube:lts-community "
 
 
 3.installing nexus
+--
 
-install the docker first.
-install nexus with the help of docker image " docker run -d -p 8081:8081 sonatype/nexus3"
+a)install the docker first.
+b)install nexus with the help of docker image " docker run -d -p 8081:8081 sonatype/nexus3"
 
 4.Install plugins inside the jenkins
+--
 
-OWASP Dependency-Check
-SonarQube Scanner
-DOCKER
-Nexus Artifact Uploader
-Eclipse Temurin installer
+a)OWASP Dependency-Check
+b)SonarQube Scanner
+c)DOCKER
+d)Nexus Artifact Uploader
+e)Eclipse Temurin installer
+f)config file provider(for nexus steup)
 
-5)go to the tool tabs in jenkins and do all the setting releated to the tools which one we have insatlled
+5)go to the tool tabs in jenkins and do all the setting releated to the tools which one we have insatlled.
+--
+6)setup cred in jenkins and also done sonar setup with jenkins.
+7)setup the nexus --go to the plugin in jenkins and installed the config file provider and after the you can see the managed files in managed jenkins then provide the maven-snapshots and maven-release inside the server section.
+--
+
+
+
