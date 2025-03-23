@@ -168,7 +168,12 @@ web interface url path, as well as the datasource url.
 
 
 
----------------Notes----------------------------
+
+
+
+
+
+---------------Notes-------------------------------------------------------------------------------------------
 1)crete three instance(jenkins,nexus and sonar qube)
 Installing jenkins on one server---
 step1:install java first 
