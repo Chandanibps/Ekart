@@ -177,8 +177,14 @@ create three instance(jenkins,nexus and sonar qube)
 
 Installing jenkins on one server---
 step1:install java first 
+
+
 "apt install openjdk-17-jre-headless"
+
+
 step2:Install jenkins and open the port 8080
+
+
 """ sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
     https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
     echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
@@ -189,14 +195,23 @@ sudo apt-get install jenkins       """"
 
 
 2)Now install sonarqube.
+
+
+
 step1: insatlling docker first
+
+
 "  sudo apt install docker.io"
 "sudo usermod -aG docker $USER && newgrp docker" or "sudo chmod 777 /var/run/docker.sock"
 step2: "  docker run -d -p 9000:9000 sonarqube:lts-community "
 
 
 3)installing nexus
+
+
 step: install the docker first.
+
+
 step2:install nexus with the help of docker image " docker run -d -p 8081:8081 sonatype/nexus3"
 
 4)Install plugins inside the jenkins
