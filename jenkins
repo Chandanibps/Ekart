@@ -1,0 +1,103 @@
+pipeline {
+    agent any
+    
+    tools {
+        maven 'maven3'  // Ensure this tool name matches Jenkins Global Tool Configuration
+        jdk 'jdk17'     // Ensure JDK 17 is configured in Jenkins
+    }
+
+    environment {
+        SCANNER_HOME = tool 'sonar'  // SonarQube Scanner tool must be configured
+    }
+
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()  // Clean workspace at the start
+            }
+        }
+        
+        stage('Git Checkout') {
+            steps {
+                git branch: 'main', 
+                url: 'https://github.com/Chandanibps/Ekart.git'
+            }
+        }
+
+        stage('Maven Compile') {
+            steps {
+                // Skip tests during compile phase
+                sh "mvn compile -DskipTests=true"
+            }
+        }
+
+        stage('OWASP Dependency Check') {
+            steps {
+                // Run OWASP Dependency Check without tests
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit',
+                odcInstallation: 'dc'  // Ensure OWASP DC is installed in Jenkins
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonar') {  // Ensure SonarQube server is configured in Jenkins
+                    sh """
+                        $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=ekart \
+                        -Dsonar.projectKey=ekart \
+                        -Dsonar.java.binaries=target/classes \
+                        -Dsonar.sources=src/
+                    """
+                }
+            }
+        }
+
+        stage('Maven Build') {
+            steps {
+                // Skip tests during the build phase
+                sh "mvn package -DskipTests=true -Djacoco.skip=true"
+            }
+        }
+
+        stage('Deploy to Nexus') {
+            steps {
+                withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                    // Skip tests during deploy
+                    sh "mvn deploy -DskipTests=true -Djacoco.skip=true"
+                }
+            }
+        }
+    }stage('dokcer bulid and tag') {
+            steps {
+               script {
+                   withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker') {
+                     dir('/var/lib/jenkins/workspace/virtual Browser/.docker/firefox') {
+                         sh 'docker build -t chandanibps/ekart:latest .'
+   
+                      }
+                }
+               }
+            }
+        }
+        stage('Trivy scan') {
+            steps {
+                
+                sh "trivy image chandanibps/ekart:latest"
+            
+            }
+        }
+        
+        stage("Docker  Push"){
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker'){   
+                      
+                       sh "docker push chandanibps/ekart:latest "
+                    }
+                }
+            }
+        }
+    
+}
